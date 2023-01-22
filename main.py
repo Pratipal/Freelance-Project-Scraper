@@ -3,8 +3,7 @@ import requests
 from time import sleep
 import datetime
 import os
-
-print('Update ChHHHHHHHHHHHHHHHHHHHHECK')
+from kaggle.api.kaggle_api_extended import KaggleApi
 
 def create_session():
     session = requests.session()
@@ -31,7 +30,7 @@ def create_session():
 def get_projects(api):
     api.dataset_download_files("prtpljdj/freeelance-platform-projects", path = "./data", unzip=True)
     df = pd.read_csv("./data/Freelance Platform Projects.csv")
-    return df, df["Title"].values[0]
+    return df, df["Title"].values[0], df['Date Posted'].values[0]
 
 
 def main():
@@ -91,15 +90,14 @@ def main():
                 'Client City', 'Client Country', 'Client Currency', 'Client Job Title']
 
     df = pd.DataFrame(data, columns = columns)
-
-    from kaggle.api.kaggle_api_extended import KaggleApi
+    
     api = KaggleApi()
     api.authenticate()
 
-    current_dataset, last_project = get_projects(api)
+    current_dataset, last_project_title, last_project_date = get_projects(api)
 
     try:
-        idx = df[df['Title']==last_project].index[0]
+        idx = df[(df['Title']==last_project_title) & (df['Date Posted'] == last_project_date)].index[0]
         latest = df[:idx]
     except:
         latest = df.copy()
