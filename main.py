@@ -103,6 +103,8 @@ def main():
         latest = df.copy()
 
     new_version = pd.concat([latest, current_dataset.fillna('')])
+    
+    new_version = new_version.drop_duplicates()
 
     api.dataset_metadata("prtpljdj/freeelance-platform-projects", path = "./data")
 
